@@ -1,0 +1,25 @@
+
+
+main : void
+main {
+    let []uint8 nums := [1,0,0,0,89,0,3];
+    print (filter(nums, isNonZero));
+}
+
+isNonZero : uint8 -> bool
+isNonZero(0) { false }
+isNonZero(_) { true }
+
+filter : []uint8 -> (uint8 -> bool) -> []uint8
+filter([], _) { [] }
+filter(x::xs, p) {
+    let []uint8 rec := filter(xs, p);
+    ifThenElse(p(x), x::rec, rec)
+}
+
+ifThenElse : bool -> a -> a -> a
+ifThenElse(b, doTrue, doFalse) {
+    case(b)
+    | true  => doTrue
+    | false => doFalse
+}
