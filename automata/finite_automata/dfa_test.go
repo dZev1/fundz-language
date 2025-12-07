@@ -1,6 +1,7 @@
 package finiteautomata
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/dZev1/fundz-language/automata/set"
@@ -159,6 +160,46 @@ func TestDFA_Accepts(t *testing.T) {
 			// TODO: update the condition below to compare got with tt.want.
 			if got != tt.want {
 				t.Errorf("Accepts() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDFA_Minimize(t *testing.T) {
+	tests := []struct {
+		name string // description of this test case
+		want *DFA[string]
+	}{
+		{
+			name: "Minimize an automaton",
+			want: &DFA[string]{
+				States:       set.Set[string]{"q0": struct{}{}, "q1": struct{}{}},
+				Alphabet:     set.Set[string]{"a": struct{}{}},
+				Transitions:  map[string]map[string]string{"q0": {"a": "q1"}, "q1": {"a": "q0"}},
+				InitialState: "q0",
+				FinalStates:  set.Set[string]{"q0": struct{}{}},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// TODO: construct the receiver type.
+			var dfa *DFA[int] = &DFA[int]{
+				States:   set.Set[int]{0: struct{}{}, 1: struct{}{}, 2: struct{}{}, 3: struct{}{}, 4: struct{}{}},
+				Alphabet: set.Set[string]{"a": struct{}{}},
+				Transitions: map[int]map[string]int{
+					0: {"a": 1},
+					1: {"a": 2},
+					2: {"a": 3},
+					3: {"a": 4},
+					4: {"a": 3},
+				},
+				FinalStates: set.Set[int]{0: struct{}{}, 2: struct{}{}},
+				InitialState: 0,
+			}
+			got := dfa.Minimize()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Minimize() = %v, want %v", got, tt.want)
 			}
 		})
 	}
