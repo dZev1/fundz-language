@@ -1,4 +1,0 @@
-type bool {
-    false,
-    true
-}

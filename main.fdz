@@ -1,0 +1,22 @@
+import stdlib.fdz
+
+main : void
+main {
+    nums : []uint8 = [1,0,0,0,89,0,3]
+    print(filter(nums, isNonZero)).
+}
+
+isNonZero : uint8 -> bool
+isNonZero(0) { false. }
+isNonZero(_) { true. }
+
+filter : []T -> (T -> bool) -> []T
+filter([], _) { [] }
+filter(x::xs, p) {
+    let rec : []T = filter(xs, p);
+    if(p(x)) then {
+        x::rec.
+    } else {
+        rec.
+    }
+}
