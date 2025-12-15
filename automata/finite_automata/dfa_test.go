@@ -175,7 +175,10 @@ func TestDFA_Minimize(t *testing.T) {
 			want: &DFA[string]{
 				States:       set.Set[string]{"q0": struct{}{}, "q1": struct{}{}},
 				Alphabet:     set.Set[string]{"a": struct{}{}},
-				Transitions:  map[string]map[string]string{"q0": {"a": "q1"}, "q1": {"a": "q0"}},
+				Transitions:  map[string]map[string]string{
+					"q0": {"a": "q1"},
+					"q1": {"a": "q0"},
+				},
 				InitialState: "q0",
 				FinalStates:  set.Set[string]{"q0": struct{}{}},
 			},
@@ -185,14 +188,12 @@ func TestDFA_Minimize(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// TODO: construct the receiver type.
 			var dfa *DFA[int] = &DFA[int]{
-				States:   set.Set[int]{0: struct{}{}, 1: struct{}{}, 2: struct{}{}, 3: struct{}{}, 4: struct{}{}},
+				States:   set.Set[int]{0: struct{}{}, 1: struct{}{}, 2: struct{}{}},
 				Alphabet: set.Set[string]{"a": struct{}{}},
 				Transitions: map[int]map[string]int{
 					0: {"a": 1},
 					1: {"a": 2},
-					2: {"a": 3},
-					3: {"a": 4},
-					4: {"a": 3},
+					2: {"a": 1},
 				},
 				FinalStates: set.Set[int]{0: struct{}{}, 2: struct{}{}},
 				InitialState: 0,
