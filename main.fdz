@@ -1,12 +1,12 @@
-import stdlib.fdz
-
 main : void
 main {
-    nums : []uint8 = [1,0,0,0,89,0,3]
+    let nums : []int = 1::[2::[3::[4::[]]]];
     print(filter(nums, isNonZero)).
 }
 
-isNonZero : uint8 -> bool
+((a, rec) => { a::rec. }) x rec --> x::rec
+
+isNonZero : int -> bool
 isNonZero(0) { false. }
 isNonZero(_) { true. }
 
@@ -20,3 +20,13 @@ filter(x::xs, p) {
         rec.
     }
 }
+
+
+map f = foldr [] (\x rec -> f x : rec) 
+
+foldr :: b -> (a -> b -> b) -> [a] -> b
+foldr cNil cCons xs = case xs of
+    [] -> cNil
+    (y:ys) -> cCons y rec
+        where
+            rec = foldr cNil cCons ys

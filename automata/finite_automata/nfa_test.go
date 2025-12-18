@@ -2,6 +2,7 @@ package finiteautomata
 
 import (
 	"github.com/dZev1/fundz-language/automata/set"
+	"reflect"
 	"testing"
 )
 
@@ -160,64 +161,55 @@ func TestNFA_AddTransition(t *testing.T) {
 	}
 }
 
-func TestNFA_Accepts(t *testing.T) {
-	nfa := NFA[int]{
-		States:   set.Set[int]{0: {}, 1: {}, 2: {}, 3: {}},
-		Alphabet: set.Set[string]{"a": {}, "b": {}},
-		Transitions: map[int]map[string]set.Set[int]{
-			0: {
-				"a": {1: {}, 2: {}},
-				"b": {2: {}},
-			},
-			1: {
-				"a": {0: {}},
-				"b": {3: {}},
-			},
-			2: {
-				"a": {2: {}, 3: {}},
-				"b": {2: {}},
-			},
-			3: {
-				"a": {2: {}},
-				"b": {2: {}},
-			},
-		},
-		InitialState: 0,
-		FinalStates:  set.Set[int]{3: {}},
-	}
-
+func TestNFA_Determinize(t *testing.T) {
 	tests := []struct {
 		name string
-		word string
-		want bool
+		nfa  *NFA[int]
+		want *DFA[string]
 	}{
 		{
-			name: "Accepted word 'ab'",
-			word: "ab",
-			want: true,
-		},
-		{
-			name: "Rejected word 'aab'",
-			word: "aab",
-			want: false,
-		},
-		{
-			name: "Accepted word 'aa'",
-			word: "aa",
-			want: true,
-		},
-		{
-			name: "Rejected word 'bbab'",
-			word: "bbab",
-			want: false,
+			name: "Determinize a NFA without instant transitions",
+			nfa: &NFA[int]{
+				States:   set.Set[int]{0: {}, 1: {}, 2: {}},
+				Alphabet: set.Set[string]{"a": {}},
+				Transitions: map[int]map[string]set.Set[int]{
+					0: {
+						"a": set.Set[int]{1: {}, 2: {}},
+					},
+					1: {
+						"a": set.Set[int]{2: {}},
+					},
+					2: map[string]set.Set[int]{
+						"a": {0: {}},
+					},
+				},
+				InitialState: 0,
+				FinalStates:  set.Set[int]{2: {}},
+			},
+			want: &DFA[string]{
+				States:   set.Set[string]{"q0": {}, "q1": {}, "q2": {}, "q3": {}},
+				Alphabet: set.Set[string]{"a": {}},
+				Transitions: map[string]map[string]string{
+					"q0": map[string]string{"a": "q1"},
+					"q1": map[string]string{"a": "q2"},
+					"q2": map[string]string{"a": "q3"},
+					"q3": map[string]string{"a": "q3"},
+				},
+				InitialState: "q0",
+				FinalStates:  set.Set[string]{"q1": {}, "q2": {}, "q3": {}},
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := nfa.Accepts(tt.word)
-			if got != tt.want {
-				t.Errorf("NFA.Accepts(%v) = %v; want %v", tt.word, got, tt.want)
+			got, err := tt.nfa.Determinize()
+			if err != nil {
+				t.Errorf("unexpected error during determinization: %v", err)
+				return
+			}
+			if !reflect.DeepEqual(tt.want, got) {
+				t.Errorf("Determinize() = %v, want %v", got, tt.want)
 			}
 		})
 	}

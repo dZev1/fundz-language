@@ -73,42 +73,47 @@ func (nfa *NFA[T]) AddTransition(fromState, toState T, symbol string) error {
 	}
 	
 	nfa.Transitions[fromState][symbol][toState] = struct{}{}
-	nfa.Alphabet[symbol] = struct{}{}
+	
+	if symbol != "" {
+		nfa.Alphabet[symbol] = struct{}{}
+	}
 
 	return nil
 }
 
-// Accepts checks if the NFA accepts the given word
-func (nfa *NFA[T]) Accepts(word string) bool {
-	currentStates := make(set.Set[T])
-	currentStates[nfa.InitialState] = struct{}{}
+func (nfa *NFA[T]) Determinize() (DFA[string], error) {
+	result := DFA[string]{}
 
-	for _, r := range word {
-		nextStates := make(set.Set[T])
-		symbol := string(r)
+	result.Alphabet = nfa.Alphabet
 
-		for state := range currentStates {
-			if transitions, ok := nfa.Transitions[state][symbol]; ok {
-				for nextState := range transitions {
-					nextStates[nextState] = struct{}{}
-				}
+	return result, nil
+}
+
+func (nfa *NFA[T]) String() string {
+	result := "NFA:\n"
+	result += "States: "
+	for state := range nfa.States {
+		result += fmt.Sprintf("%v ", state)
+	}
+	result += "\nAlphabet: "
+	for symbol := range nfa.Alphabet {
+		result += fmt.Sprintf("%v ", symbol)
+	}
+	result += "\nTransitions:\n"
+	for fromState, transitions := range nfa.Transitions {
+		for symbol, toStates := range transitions {
+			for toState := range toStates {
+				result += fmt.Sprintf("  %v --%v--> %v\n", fromState, symbol, toState)
 			}
 		}
-
-		currentStates = nextStates
-
-		if len(currentStates) == 0 {
-			return false
-		}
 	}
-
-	for state := range currentStates {
-		if _, ok := nfa.FinalStates[state]; ok {
-			return true
-		}
+	result += fmt.Sprintf("Initial State: %v\n", nfa.InitialState)
+	result += "Final States: "
+	for state := range nfa.FinalStates {
+		result += fmt.Sprintf("%v ", state)
 	}
-
-	return false
+	result += "\n"
+	return result
 }
 
 
