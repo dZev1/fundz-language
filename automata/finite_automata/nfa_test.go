@@ -1,9 +1,10 @@
 package finiteautomata
 
 import (
-	"github.com/dZev1/fundz-language/automata/set"
 	"reflect"
 	"testing"
+
+	"github.com/dZev1/fundz-language/automata/set"
 )
 
 func TestNFA_AddState(t *testing.T) {
@@ -179,7 +180,7 @@ func TestNFA_Determinize(t *testing.T) {
 					1: {
 						"a": set.Set[int]{2: {}},
 					},
-					2: map[string]set.Set[int]{
+					2: {
 						"a": {0: {}},
 					},
 				},
@@ -187,14 +188,9 @@ func TestNFA_Determinize(t *testing.T) {
 				FinalStates:  set.Set[int]{2: {}},
 			},
 			want: &DFA[string]{
-				States:   set.Set[string]{"q0": {}, "q1": {}, "q2": {}, "q3": {}},
-				Alphabet: set.Set[string]{"a": {}},
-				Transitions: map[string]map[string]string{
-					"q0": map[string]string{"a": "q1"},
-					"q1": map[string]string{"a": "q2"},
-					"q2": map[string]string{"a": "q3"},
-					"q3": map[string]string{"a": "q3"},
-				},
+				States:       set.Set[string]{"q0": {}, "q1": {}, "q2": {}, "q3": {}},
+				Alphabet:     set.Set[string]{"a": {}},
+				Transitions:  map[string]map[string]string{"q0": {"a": "q1"}, "q1": {"a": "q2"}, "q2": {"a": "q3"}, "q3": {"a": "q3"}},
 				InitialState: "q0",
 				FinalStates:  set.Set[string]{"q1": {}, "q2": {}, "q3": {}},
 			},
@@ -210,6 +206,52 @@ func TestNFA_Determinize(t *testing.T) {
 			}
 			if !reflect.DeepEqual(tt.want, got) {
 				t.Errorf("Determinize() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNFA_lambdaClosure(t *testing.T) {
+	tests := []struct {
+		name   string
+		nfa    *NFA[int]
+		states set.Set[int]
+		want   set.Set[int]
+	}{
+		{
+			name: "Lambda closure of a set of only one state",
+			nfa: &NFA[int]{
+				States:   set.Set[int]{0: {}, 1: {}, 2: {}},
+				Alphabet: set.Set[string]{"a": {}},
+				Transitions: map[int]map[string]set.Set[int]{
+					0: {
+						"a": set.Set[int]{1: {}, 2: {}},
+					},
+					1: {
+						"a": set.Set[int]{2: {}},
+					},
+					2: {
+						"a": {0: {}},
+					},
+				},
+				InitialState: 0,
+				FinalStates:  set.Set[int]{2: {}},
+			},
+			states: set.Set[int]{0:{}},
+			want: set.Set[int]{0:{}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.nfa.lambdaClosure(tt.states)
+
+			if err != nil {
+				t.Errorf("unexpected error during determinization: %v", err)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("lambdaClosure() = %v, want %v", got, tt.want)
 			}
 		})
 	}

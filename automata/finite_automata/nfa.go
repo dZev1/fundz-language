@@ -89,6 +89,15 @@ func (nfa *NFA[T]) Determinize() (DFA[string], error) {
 	return result, nil
 }
 
+func (nfa *NFA[T]) lambdaClosure(states set.Set[T]) (set.Set[T], error) {
+	return states, nil
+}
+
+
+func (nfa *NFA[T]) move(states set.Set[T]) (set.Set[T], error) {
+	return states, nil
+}
+
 func (nfa *NFA[T]) String() string {
 	result := "NFA:\n"
 	result += "States: "
