@@ -10,7 +10,7 @@
   - [x] Determinization
   - [x] Add transitions
   - [x] Add states
-- [ ] Regular expression toNFA functions.
+- [ ] Regular expression toNFA implementation.
   - [ ] ∅.
   - [ ] λ.
   - [ ] a.
