@@ -199,11 +199,8 @@ func TestNFA_Determinize(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.nfa.Determinize()
-			if err != nil {
-				t.Errorf("unexpected error during determinization: %v", err)
-				return
-			}
+			got := tt.nfa.Determinize()
+			
 			if !reflect.DeepEqual(tt.want, got) {
 				t.Errorf("Determinize() = %v, want %v", got, tt.want)
 			}
@@ -240,18 +237,139 @@ func TestNFA_lambdaClosure(t *testing.T) {
 			states: set.Set[int]{0:{}},
 			want: set.Set[int]{0:{}},
 		},
+		{
+			name: "Lambda closure of a set of multiple states",
+			nfa: &NFA[int]{
+				States:   set.Set[int]{0: {}, 1: {}, 2: {}, 3: {}},
+				Alphabet: set.Set[string]{"a": {}},
+				Transitions: map[int]map[string]set.Set[int]{
+					0: {
+						"a": set.Set[int]{1: {}},
+						"":  set.Set[int]{2: {}},
+					},
+					1: {
+						"a": set.Set[int]{3: {}},
+					},
+					2: {
+						"": set.Set[int]{3: {}},
+					},
+					3: {
+						"a": {0: {}},
+					},
+				},
+				InitialState: 0,
+				FinalStates:  set.Set[int]{3: {}},
+			},
+			states: set.Set[int]{0:{}},
+			want: set.Set[int]{0:{},2:{},3:{}},
+		},
+		{
+			name: "Lambda closure of an empty set",
+			nfa: &NFA[int]{
+				States:   set.Set[int]{0: {}, 1: {}, 2: {}, 3: {}},
+				Alphabet: set.Set[string]{"a": {}},
+				Transitions: map[int]map[string]set.Set[int]{
+					0: {
+						"a": set.Set[int]{1: {}},
+						"":  set.Set[int]{2: {}},
+					},
+					1: {
+						"a": set.Set[int]{3: {}},
+					},
+					2: {
+						"": set.Set[int]{3: {}},
+					},
+					3: {
+						"a": {0: {}},
+					},
+				},
+				InitialState: 0,
+				FinalStates:  set.Set[int]{3: {}},
+			},
+			states: set.Set[int]{},
+			want:   set.Set[int]{},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.nfa.lambdaClosure(tt.states)
+			got, _ := tt.nfa.lambdaClosure(tt.states)
 
-			if err != nil {
-				t.Errorf("unexpected error during determinization: %v", err)
-				return
-			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("lambdaClosure() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNFA_move(t *testing.T) {
+	tests := []struct {
+		name   string
+		nfa    *NFA[int]
+		states set.Set[int]
+		symbol string
+		want   set.Set[int]
+	}{
+		{
+			name: "Move from a set of states with a symbol",
+			nfa: &NFA[int]{
+				States:   set.Set[int]{0: {}, 1: {}, 2: {}, 3: {}},
+				Alphabet: set.Set[string]{"a": {}},
+				Transitions: map[int]map[string]set.Set[int]{
+					0: {
+						"a": set.Set[int]{1: {}, 2: {}},
+					},
+					1: {
+						"a": set.Set[int]{3: {}},
+					},
+					2: {
+						"a": {3: {}},
+					},
+					3: {
+						"a": {0: {}},
+					},
+				},
+				InitialState: 0,
+				FinalStates:  set.Set[int]{3: {}},
+			},
+			states: set.Set[int]{0: {}, 1: {}},
+			symbol: "a",
+			want:   set.Set[int]{1: {}, 2: {}, 3: {}},
+		},
+		{
+			name: "Move from an empty set of states",
+			nfa: &NFA[int]{
+				States:   set.Set[int]{0: {}, 1: {}, 2: {}, 3: {}},
+				Alphabet: set.Set[string]{"a": {}},
+				Transitions: map[int]map[string]set.Set[int]{
+					0: {
+						"a": set.Set[int]{1: {}, 2: {}},
+					},
+					1: {
+						"a": set.Set[int]{3: {}},
+					},
+					2: {
+						"a": {3: {}},
+					},
+					3: {
+						"a": {0: {}},
+					},
+				},
+				InitialState: 0,
+				FinalStates:  set.Set[int]{3: {}},
+			},
+			states: set.Set[int]{},
+			symbol: "a",
+			want:   set.Set[int]{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, _ := tt.nfa.move(tt.states, tt.symbol)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("move() = %v, want %v", got, tt.want)
 			}
 		})
 	}

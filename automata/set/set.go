@@ -27,3 +27,11 @@ func Intersection[T comparable](s1, s2 Set[T]) Set[T] {
 	}
 	return intersection
 }
+
+func Add[T comparable](s *Set[T], element T) {
+	(*s)[element] = struct{}{}
+}
+
+func Remove[T comparable](s *Set[T], element T) {
+	delete(*s, element)
+}

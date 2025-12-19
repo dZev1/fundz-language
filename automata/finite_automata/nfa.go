@@ -2,6 +2,7 @@ package finiteautomata
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/dZev1/fundz-language/automata/set"
 )
@@ -81,21 +82,148 @@ func (nfa *NFA[T]) AddTransition(fromState, toState T, symbol string) error {
 	return nil
 }
 
-func (nfa *NFA[T]) Determinize() (DFA[string], error) {
-	result := DFA[string]{}
+func (nfa *NFA[T]) Determinize() *DFA[string] {
+	result := &DFA[string]{
+		States: make(set.Set[string]),
+		Alphabet: make(set.Set[string]),
+		Transitions: make(map[string]map[string]string),
+		FinalStates: make(set.Set[string]),
+	}
+	
+	for symbol := range nfa.Alphabet {
+		result.Alphabet[symbol] = struct{}{}
+	}
+	
+	currIndex := 0
+	initialState, isFinal := nfa.lambdaClosure(set.Set[T]{nfa.InitialState:{}})
+	initialStateID := fmt.Sprintf("q%d", currIndex)
+	
+	mapNFAtoDFA := make(map[string]string)
+	setToID := make(map[string]string)
+	
+	initialStateStr := serializeSet(initialState)
+	setToID[initialStateStr] = initialStateID
+	mapNFAtoDFA[initialStateStr] = initialStateID
+	
+	result.States[initialStateID] = struct{}{}
+	if isFinal {
+		result.FinalStates[initialStateID] = struct{}{}
+	}
 
-	result.Alphabet = nfa.Alphabet
+	currIndex++
+	result.InitialState = initialStateID
+	
+	queue := []set.Set[T]{initialState}
+	processed := make(map[string]bool)
 
-	return result, nil
+	for len(queue) > 0 {
+		states := queue[0]
+		queue = queue[1:]
+		
+		statesStr := serializeSet(states)
+		if processed[statesStr] {
+			continue
+		}
+		processed[statesStr] = true
+
+		dfaFromState := setToID[statesStr]
+		
+		for symbol := range nfa.Alphabet {
+			reachableStates, isFinal := nfa.move(states, symbol)
+			reachableStr := serializeSet(reachableStates)
+			
+			if _, exists := setToID[reachableStr]; !exists {
+				dfaState := fmt.Sprintf("q%d", currIndex)
+				setToID[reachableStr] = dfaState
+				result.States[dfaState] = struct{}{}
+				if isFinal {
+					result.FinalStates[dfaState] = struct{}{}
+				}
+				queue = append(queue, reachableStates)
+				currIndex++
+			}
+			
+			dfaToState := setToID[reachableStr]
+			result.AddTransition(dfaFromState, dfaToState, symbol)
+		}
+	}
+
+	return result
 }
 
-func (nfa *NFA[T]) lambdaClosure(states set.Set[T]) (set.Set[T], error) {
-	return states, nil
+func serializeSet[T comparable](s set.Set[T]) string {
+	var strs []string
+	for state := range s {
+		strs = append(strs, fmt.Sprintf("%v", state))
+	}
+	slices.Sort(strs)
+	return "{" + fmt.Sprintf("%v", strs) + "}"
+}
+
+func (nfa *NFA[T]) lambdaClosure(states set.Set[T]) (set.Set[T], bool) {
+	result := make(set.Set[T])
+
+	isFinal := false
+
+	stack := make([]T, 0)
+	visited := make(set.Set[T])
+
+	for state := range states {
+		stack = append(stack, state)
+		result[state] = struct{}{}
+		visited[state] = struct{}{}
+	}
+
+	for len(stack) > 0 {
+		currentState := stack[len(stack)-1]
+		if _, ok := nfa.FinalStates[currentState]; ok {
+			isFinal = true
+		}
+		stack = stack[:len(stack)-1]
+		
+		transitions, ok := nfa.Transitions[currentState]
+		if !ok {
+			continue
+		}
+		
+		lambdaTransitions, ok := transitions[""]
+		if !ok {
+			continue
+		}
+		
+		for toState := range lambdaTransitions {
+			if _, seen := visited[toState]; !seen {
+				result[toState] = struct{}{}
+				visited[toState] = struct{}{}
+				stack = append(stack, toState)
+			}
+		}
+	}
+	
+	return result, isFinal
 }
 
 
-func (nfa *NFA[T]) move(states set.Set[T]) (set.Set[T], error) {
-	return states, nil
+func (nfa *NFA[T]) move(states set.Set[T], symbol string) (set.Set[T], bool) {
+	reachable := make(set.Set[T])
+
+	for state := range states {
+		transitions, ok := nfa.Transitions[state]
+		if !ok {
+			continue
+		}
+
+		toStates, ok := transitions[symbol]
+		if !ok {
+			continue
+		}
+
+		for toState := range toStates {
+			set.Add(&reachable, toState)
+		}
+	}
+	reachableClosure, isFinal := nfa.lambdaClosure(reachable)
+	return reachableClosure, isFinal
 }
 
 func (nfa *NFA[T]) String() string {
