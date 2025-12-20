@@ -10,14 +10,14 @@
   - [x] Determinization
   - [x] Add transitions
   - [x] Add states
-- [ ] Regular expression toNFA implementation.
-  - [ ] ∅.
-  - [ ] λ.
-  - [ ] a.
-  - [ ] r|s.
-  - [ ] rs.
-  - [ ] r*.
-  - [ ] r+.
+- [x] Regular expression toNFA implementation.
+  - [x] ∅.
+  - [x] λ.
+  - [x] a.
+  - [x] r|s.
+  - [x] rs.
+  - [x] r*.
+  - [x] r+.
 - [ ] Check syntax and grammar for the language
 - [ ] Define tokens
 - [ ] Automata for every token.
@@ -26,4 +26,4 @@
 
 ## PARSER
 
-- [ ] Investigate about DPDA and PDA and Grammars and check which way it's better
+- [ ] Investigate about DPDA and PDA and Grammars and check which way it's better.

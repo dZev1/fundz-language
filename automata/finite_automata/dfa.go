@@ -98,6 +98,8 @@ func (dfa *DFA[T]) Accepts(word string) bool {
 
 // Minimize a DFA using Hopcroft's algorithm
 func (dfa *DFA[T]) Minimize() *DFA[string] {
+	dfa.RemoveUnreachableStates()
+	
 	finalPartition := dfa.FinalStates
 	nonFinalPartition := make(set.Set[T])
 	for state := range dfa.States {
@@ -185,7 +187,7 @@ func (dfa *DFA[T]) Minimize() *DFA[string] {
 		}
 	}
 
-	return minimized
+	return minimized.NormalizeStates()
 }
 
 // refinePartition splits a partition based on transitions to other partitions
@@ -280,4 +282,86 @@ func (dfa *DFA[T]) String() string {
 	}
 	result += "\n"
 	return result
+}
+
+func (dfa *DFA[T]) NormalizeStates() *DFA[string] {
+	stateMap := make(map[T]string)
+	newStates := make(set.Set[string])
+	newTransitions := make(map[string]map[string]string)
+	var index int = 0
+	for state := range dfa.States {
+		newState := fmt.Sprintf("q%d", index)
+		stateMap[state] = newState
+		newStates[newState] = struct{}{}
+		index++
+	}
+	for fromState, transitions := range dfa.Transitions {
+		newFromState := stateMap[fromState]
+		newTransitions[newFromState] = make(map[string]string)
+		for symbol, toState := range transitions {
+			newToState := stateMap[toState]
+			newTransitions[newFromState][symbol] = newToState
+		}
+	}
+	normalized := &DFA[string]{
+		States:       newStates,
+		Alphabet:     dfa.Alphabet,
+		Transitions:  newTransitions,
+		InitialState: stateMap[dfa.InitialState],
+		FinalStates:  make(set.Set[string]),
+	}
+	for finalState := range dfa.FinalStates {
+		normalized.FinalStates[stateMap[finalState]] = struct{}{}
+	}
+	return normalized
+}
+
+// RemoveUnreachableStates removes states that cannot be reached from the initial state
+func (dfa *DFA[T]) RemoveUnreachableStates() *DFA[T] {
+    reachable := make(set.Set[T])
+    queue := []T{dfa.InitialState}
+    reachable[dfa.InitialState] = struct{}{}
+
+    for len(queue) > 0 {
+        state := queue[0]
+        queue = queue[1:]
+
+        if transitions, ok := dfa.Transitions[state]; ok {
+            for _, toState := range transitions {
+                if _, ok := reachable[toState]; !ok {
+                    reachable[toState] = struct{}{}
+                    queue = append(queue, toState)
+                }
+            }
+        }
+    }
+
+    newDFA := &DFA[T]{
+        States:       make(set.Set[T]),
+        Alphabet:     dfa.Alphabet,
+        Transitions:  make(map[T]map[string]T),
+        InitialState: dfa.InitialState,
+        FinalStates:  make(set.Set[T]),
+    }
+
+    for state := range reachable {
+        newDFA.States[state] = struct{}{}
+        newDFA.Transitions[state] = make(map[string]T)
+
+        if _, ok := dfa.FinalStates[state]; ok {
+            newDFA.FinalStates[state] = struct{}{}
+        }
+    }
+
+    for state := range reachable {
+        if transitions, ok := dfa.Transitions[state]; ok {
+            for symbol, toState := range transitions {
+                if _, ok := reachable[toState]; ok {
+                    newDFA.Transitions[state][symbol] = toState
+                }
+            }
+        }
+    }
+
+    return newDFA
 }

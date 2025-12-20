@@ -130,6 +130,12 @@ func (nfa *NFA[T]) Determinize() *DFA[string] {
 		
 		for symbol := range nfa.Alphabet {
 			reachableStates, isFinal := nfa.move(states, symbol)
+
+			// Skip empty transitions - don't create dead states
+			if len(reachableStates) == 0 {
+				continue
+			}
+
 			reachableStr := serializeSet(reachableStates)
 			
 			if _, exists := setToID[reachableStr]; !exists {
@@ -254,3 +260,35 @@ func (nfa *NFA[T]) String() string {
 }
 
 
+func (nfa *NFA[T]) NormalizeStates(prefix string) {
+	stateMap := make(map[T]T)
+	newStates := make(set.Set[T])
+	newTransitions := make(map[T]map[string]set.Set[T])
+	var index int = 0
+
+	for state := range nfa.States {
+		newState := any(fmt.Sprintf("%s%d", prefix, index)).(T)
+		stateMap[state] = newState
+		newStates[newState] = struct{}{}
+		index++
+	}
+	for fromState, transitions := range nfa.Transitions {
+		newFromState := stateMap[fromState]
+		newTransitions[newFromState] = make(map[string]set.Set[T])
+		for symbol, toStates := range transitions {
+			newTransitions[newFromState][symbol] = make(set.Set[T])
+			for toState := range toStates {
+				newToState := stateMap[toState]
+				newTransitions[newFromState][symbol][newToState] = struct{}{}
+			}
+		}
+	}
+	nfa.States = newStates
+	nfa.Transitions = newTransitions
+	nfa.InitialState = stateMap[nfa.InitialState]
+	newFinalStates := make(set.Set[T])
+	for finalState := range nfa.FinalStates {
+		newFinalStates[stateMap[finalState]] = struct{}{}
+	}
+	nfa.FinalStates = newFinalStates
+}
