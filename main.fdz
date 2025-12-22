@@ -1,10 +1,10 @@
 main : void
 main {
-    let nums : []int = 1::[2::[3::[4::[]]]];
+    let nums : []int = 1::[2::[3::[]]];
     print(filter(nums, isNonZero)).
 }
 
-((a, rec) => { a::rec. }) x rec --> x::rec
+(x) => ((y) => x + y) == (x,y) => x + y
 
 isNonZero : int -> bool
 isNonZero(0) { false. }
@@ -20,13 +20,3 @@ filter(x::xs, p) {
         rec.
     }
 }
-
-
-map f = foldr [] (\x rec -> f x : rec) 
-
-foldr :: b -> (a -> b -> b) -> [a] -> b
-foldr cNil cCons xs = case xs of
-    [] -> cNil
-    (y:ys) -> cCons y rec
-        where
-            rec = foldr cNil cCons ys

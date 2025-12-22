@@ -3,7 +3,7 @@ export (
     filter : (T -> bool) -> []T -> []T
     filter(_, []) { [] }
     filter(p, x::xs) {
-        rec : []T = filter(p, xs);
+        let rec : []T = filter(p, xs);
         ifThenElse(p(x), x::rec, rec)
     }
 
