@@ -5,15 +5,15 @@ import (
 )
 
 type Lexer struct {
-	input 	  string
-	position int
+	input        string
+	position     int
 	readPosition int
-	ch 	  byte
+	ch           byte
 }
 
 func New(input string) *Lexer {
 	l := &Lexer{input: input}
-	
+
 	l.readChar()
 
 	return l
@@ -65,9 +65,36 @@ func (l *Lexer) NextToken() token.Token {
 			ch := l.ch
 			l.readChar()
 			literal := string(ch) + string(l.ch)
-			tok = token.Token{Type: token.NOT_EQ, Literal: literal}
+			tok = token.Token{Type: token.NEQ, Literal: literal}
 		} else {
 			tok = newToken(token.BANG, l.ch)
+		}
+	case '|':
+		if l.peekChar() == '|' {
+			ch := l.ch
+			l.readChar()
+			literal := string(ch) + string(l.ch)
+			tok = token.Token{Type: token.OR, Literal: literal}
+		} else {
+			tok = newToken(token.PIPE, l.ch)
+		}
+	case '^':
+		if l.peekChar() == '|' {
+			ch := l.ch
+			l.readChar()
+			literal := string(ch) + string(l.ch)
+			tok = token.Token{Type: token.XOR, Literal: literal}
+		} else {
+			tok = newToken(token.EXP, l.ch)
+		}
+	case '&':
+		if l.peekChar() == '&' {
+			ch := l.ch
+			l.readChar()
+			literal := string(ch) + string(l.ch)
+			tok = token.Token{Type: token.AND, Literal: literal}
+		} else {
+			tok = newToken(token.ILLEGAL, l.ch)
 		}
 	case '/':
 		tok = newToken(token.SLASH, l.ch)

@@ -4,8 +4,6 @@ main {
     print(filter(nums, isNonZero)).
 }
 
-(x) => ((y) => x + y) == (x,y) => x + y
-
 isNonZero : int -> bool
 isNonZero(0) { false. }
 isNonZero(_) { true. }
@@ -14,9 +12,22 @@ filter : []T -> (T -> bool) -> []T
 filter([], _) { [] }
 filter(x::xs, p) {
     let rec : []T = filter(xs, p);
-    if(p(x)) then {
+    if (p(x)) then {
         x::rec.
     } else {
         rec.
     }
 }
+
+foo : int -> bool
+foo(1) { true. }
+foo(2) { false. }
+foo(n) {
+    if ((%)(n,2) == 0) then {
+        foo(n - 1).
+    } else {
+        foo(2 * n).
+    }
+} 
+
+

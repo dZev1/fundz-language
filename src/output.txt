@@ -1,0 +1,129 @@
+Fundz version SNAPSHOT01w26 Diego Zevallos . 1000 . /home/dezetin
+Type 'help', 'license' 'credits' or 'copyright' for more information
+>> {Type:IDENT Literal:main}
+{Type:: Literal::}
+{Type:IDENT Literal:void}
+>> {Type:IDENT Literal:main}
+{Type:{ Literal:{}
+>> {Type:LET Literal:let}
+{Type:IDENT Literal:nums}
+{Type:: Literal::}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:INT_TYPE Literal:int}
+{Type:= Literal:=}
+{Type:INT Literal:1}
+{Type::: Literal:::}
+{Type:[ Literal:[}
+{Type:INT Literal:2}
+{Type::: Literal:::}
+{Type:[ Literal:[}
+{Type:INT Literal:3}
+{Type::: Literal:::}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:] Literal:]}
+{Type:] Literal:]}
+{Type:; Literal:;}
+>> {Type:IDENT Literal:print}
+{Type:( Literal:(}
+{Type:IDENT Literal:filter}
+{Type:( Literal:(}
+{Type:IDENT Literal:nums}
+{Type:, Literal:,}
+{Type:IDENT Literal:isNonZero}
+{Type:) Literal:)}
+{Type:) Literal:)}
+{Type:. Literal:.}
+>> {Type:} Literal:}}
+>> >> {Type:IDENT Literal:isNonZero}
+{Type:: Literal::}
+{Type:INT_TYPE Literal:int}
+{Type:-> Literal:->}
+{Type:BOOL_TYPE Literal:bool}
+>> {Type:IDENT Literal:isNonZero}
+{Type:( Literal:(}
+{Type:INT Literal:0}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+{Type:FALSE Literal:false}
+{Type:. Literal:.}
+{Type:} Literal:}}
+>> {Type:IDENT Literal:isNonZero}
+{Type:( Literal:(}
+{Type:_ Literal:_}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+{Type:TRUE Literal:true}
+{Type:. Literal:.}
+{Type:} Literal:}}
+>> >> {Type:IDENT Literal:filter}
+{Type:: Literal::}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:IDENT Literal:T}
+{Type:-> Literal:->}
+{Type:( Literal:(}
+{Type:IDENT Literal:T}
+{Type:-> Literal:->}
+{Type:BOOL_TYPE Literal:bool}
+{Type:) Literal:)}
+{Type:-> Literal:->}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:IDENT Literal:T}
+>> {Type:IDENT Literal:filter}
+{Type:( Literal:(}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:, Literal:,}
+{Type:_ Literal:_}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:} Literal:}}
+>> {Type:IDENT Literal:filter}
+{Type:( Literal:(}
+{Type:IDENT Literal:x}
+{Type::: Literal:::}
+{Type:IDENT Literal:xs}
+{Type:, Literal:,}
+{Type:IDENT Literal:p}
+{Type:) Literal:)}
+{Type:{ Literal:{}
+>> {Type:LET Literal:let}
+{Type:IDENT Literal:rec}
+{Type:: Literal::}
+{Type:[ Literal:[}
+{Type:] Literal:]}
+{Type:IDENT Literal:T}
+{Type:= Literal:=}
+{Type:IDENT Literal:filter}
+{Type:( Literal:(}
+{Type:IDENT Literal:xs}
+{Type:, Literal:,}
+{Type:IDENT Literal:p}
+{Type:) Literal:)}
+{Type:; Literal:;}
+>> {Type:IF Literal:if}
+{Type:( Literal:(}
+{Type:IDENT Literal:p}
+{Type:( Literal:(}
+{Type:IDENT Literal:x}
+{Type:) Literal:)}
+{Type:) Literal:)}
+{Type:THEN Literal:then}
+{Type:{ Literal:{}
+>> {Type:IDENT Literal:x}
+{Type::: Literal:::}
+{Type:IDENT Literal:rec}
+{Type:. Literal:.}
+>> {Type:} Literal:}}
+{Type:ELSE Literal:else}
+{Type:{ Literal:{}
+>> {Type:IDENT Literal:rec}
+{Type:. Literal:.}
+>> {Type:} Literal:}}
+>> {Type:} Literal:}}
+>> 

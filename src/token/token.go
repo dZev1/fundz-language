@@ -26,22 +26,26 @@ const (
 	RARROW   = "->"
 	LARROW   = "<-"
 	DRARROW  = "=>"
+	EXP      = "^"
 
-	LT = "<"
+	LT  = "<"
 	LEQ = "<="
-	GT = ">"
+	GT  = ">"
 	GEQ = ">="
 
-	EQ     = "=="
-	NOT_EQ = "!="
+	EQ  = "=="
+	NEQ = "!="
+	AND = "&&"
+	OR  = "||"
+	XOR = "^|"
 
 	// Delimiters
+	PIPE         = "|"
 	COMMA        = ","
 	DOT          = "."
 	SEMICOLON    = ";"
 	COLON        = ":"
 	DOUBLE_COLON = "::"
-	
 
 	LPAREN   = "("
 	RPAREN   = ")"
@@ -65,16 +69,16 @@ const (
 )
 
 var keywords = map[string]TokenType{
-	"let":        LET,
-	"true":       TRUE,
-	"false":      FALSE,
-	"if":         IF,
-	"then":       THEN,
-	"else":       ELSE,
-	"bool":       BOOL_TYPE,
-	"int":        INT_TYPE,
-	"char":       CHAR_TYPE,
-	"float":      FLOAT_TYPE,
+	"let":   LET,
+	"true":  TRUE,
+	"false": FALSE,
+	"if":    IF,
+	"then":  THEN,
+	"else":  ELSE,
+	"bool":  BOOL_TYPE,
+	"int":   INT_TYPE,
+	"char":  CHAR_TYPE,
+	"float": FLOAT_TYPE,
 }
 
 func LookupIdent(ident string) TokenType {
