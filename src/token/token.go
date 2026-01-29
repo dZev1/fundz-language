@@ -27,6 +27,7 @@ const (
 	LARROW   = "<-"
 	DRARROW  = "=>"
 	EXP      = "^"
+	MODULO   = "%"
 
 	LT  = "<"
 	LEQ = "<="
@@ -66,6 +67,7 @@ const (
 	INT_TYPE   = "INT_TYPE"
 	CHAR_TYPE  = "CHAR_TYPE"
 	FLOAT_TYPE = "FLOAT_TYPE"
+	VOID_TYPE = "VOID_TYPE"
 )
 
 var keywords = map[string]TokenType{
@@ -79,6 +81,7 @@ var keywords = map[string]TokenType{
 	"int":   INT_TYPE,
 	"char":  CHAR_TYPE,
 	"float": FLOAT_TYPE,
+	"void": VOID_TYPE,
 }
 
 func LookupIdent(ident string) TokenType {

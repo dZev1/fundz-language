@@ -8,9 +8,9 @@ isNonZero : int -> bool
 isNonZero(0) { false. }
 isNonZero(_) { true. }
 
-filter : []T -> (T -> bool) -> []T
-filter([], _) { [] }
-filter(x::xs, p) {
+filter : (T -> bool) -> []T -> []T
+filter(_, x::xs) { [] }
+filter(p, x::xs) {
     let rec : []T = filter(xs, p);
     if (p(x)) then {
         x::rec.
@@ -20,14 +20,8 @@ filter(x::xs, p) {
 }
 
 foo : int -> bool
-foo(1) { true. }
-foo(2) { false. }
-foo(n) {
-    if ((%)(n,2) == 0) then {
-        foo(n - 1).
-    } else {
-        foo(2 * n).
-    }
-} 
+foo(n) = (x) => {
+    let z : int = if (x % 2 == 0) then { x + 2. } else { 2*x. }
 
-
+    if (z == 2) then { true. } else { false. }
+}

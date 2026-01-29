@@ -3,8 +3,9 @@
 ## LEXER
 
 - [x] Tokenization
-- [ ] Lexer structure
+- [x] Lexer structure
 
 ## PARSER
 
-- [ ] Investigate about DPDA and PDA and Grammars and check which way it's better.
+- [x] Grammar of the language
+- [ ] Build parser
